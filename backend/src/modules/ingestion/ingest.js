@@ -9,28 +9,89 @@ const simpleGit = require("simple-git");
 
 // ---- Config ----
 const IGNORE_DIRS = new Set([
-  "node_modules", ".git", "dist", "build", ".next", "coverage",
-  "vendor", ".venv", "venv", "__pycache__", ".cache", "out",
+  "node_modules",
+  ".git",
+  "dist",
+  "build",
+  ".next",
+  "coverage",
+  "vendor",
+  ".venv",
+  "venv",
+  "__pycache__",
+  ".cache",
+  "out",
+  // Tests/examples/docs are ~85-95% of chunks in typical repos and crowd out
+  // real implementation code. Set INCLUDE_TESTS=true in .env to index them.
+  ...(process.env.INCLUDE_TESTS === "true"
+    ? []
+    : [
+        "test",
+        "tests",
+        "__tests__",
+        "spec",
+        "examples",
+        "example",
+        "docs",
+        "fixtures",
+      ]),
 ]);
 
+// Changelogs repeat every API name in the project and match almost any query.
+const NOISE_FILE = /^(History|CHANGELOG|CHANGES|HISTORY)[^/]*\.md$/i;
+
 const IGNORE_EXTENSIONS = new Set([
-  ".png", ".jpg", ".jpeg", ".gif", ".svg", ".ico", ".webp", ".bmp",
-  ".mp4", ".mov", ".mp3", ".wav", ".pdf", ".zip", ".tar", ".gz",
-  ".woff", ".woff2", ".ttf", ".eot", ".lock", ".map",
+  ".png",
+  ".jpg",
+  ".jpeg",
+  ".gif",
+  ".svg",
+  ".ico",
+  ".webp",
+  ".bmp",
+  ".mp4",
+  ".mov",
+  ".mp3",
+  ".wav",
+  ".pdf",
+  ".zip",
+  ".tar",
+  ".gz",
+  ".woff",
+  ".woff2",
+  ".ttf",
+  ".eot",
+  ".lock",
+  ".map",
 ]);
 
 const IGNORE_FILES = new Set([
-  "package-lock.json", "yarn.lock", "pnpm-lock.yaml", ".DS_Store",
+  "package-lock.json",
+  "yarn.lock",
+  "pnpm-lock.yaml",
+  ".DS_Store",
 ]);
 
 const LANGUAGE_MAP = {
-  ".js": "javascript", ".jsx": "javascript",
-  ".ts": "typescript", ".tsx": "typescript",
-  ".py": "python", ".java": "java", ".go": "go",
-  ".rb": "ruby", ".php": "php", ".c": "c", ".cpp": "cpp",
-  ".cs": "csharp", ".rs": "rust", ".md": "markdown",
-  ".json": "json", ".html": "html", ".css": "css",
-  ".yml": "yaml", ".yaml": "yaml",
+  ".js": "javascript",
+  ".jsx": "javascript",
+  ".ts": "typescript",
+  ".tsx": "typescript",
+  ".py": "python",
+  ".java": "java",
+  ".go": "go",
+  ".rb": "ruby",
+  ".php": "php",
+  ".c": "c",
+  ".cpp": "cpp",
+  ".cs": "csharp",
+  ".rs": "rust",
+  ".md": "markdown",
+  ".json": "json",
+  ".html": "html",
+  ".css": "css",
+  ".yml": "yaml",
+  ".yaml": "yaml",
 };
 
 const MAX_FILE_SIZE_BYTES = 300 * 1024; // skip files > 300kb (likely generated/minified)
@@ -66,6 +127,7 @@ function walkDir(rootDir) {
       }
 
       if (IGNORE_FILES.has(entry.name)) continue;
+      if (NOISE_FILE.test(entry.name)) continue;
 
       const ext = path.extname(entry.name).toLowerCase();
       if (IGNORE_EXTENSIONS.has(ext)) continue;
@@ -84,7 +146,10 @@ function walkDir(rootDir) {
       // Skip likely-binary content (null bytes)
       if (content.includes("\u0000")) continue;
 
-      const relativePath = path.relative(rootDir, fullPath).split(path.sep).join("/");
+      const relativePath = path
+        .relative(rootDir, fullPath)
+        .split(path.sep)
+        .join("/");
 
       results.push({
         filePath: relativePath,
@@ -104,8 +169,12 @@ function walkDir(rootDir) {
  * @returns {Promise<{ files: Array, fileCount: number, skipped: boolean }>}
  */
 async function ingestRepo(repoUrl) {
-  if (!/^https:\/\/github\.com\/[\w.-]+\/[\w.-]+(\.git)?$/.test(repoUrl.trim())) {
-    throw new Error("Invalid GitHub repo URL. Expected format: https://github.com/owner/repo");
+  if (
+    !/^https:\/\/github\.com\/[\w.-]+\/[\w.-]+(\.git)?$/.test(repoUrl.trim())
+  ) {
+    throw new Error(
+      "Invalid GitHub repo URL. Expected format: https://github.com/owner/repo",
+    );
   }
 
   const tmpDir = await cloneRepo(repoUrl);
