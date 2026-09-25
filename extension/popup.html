@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Repo Intelligence</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header>
+        <div class="header-top">
+          <h1>🔍 Repo Intelligence</h1>
+          <button
+            id="btn-clear"
+            class="icon-btn"
+            title="Clear chat for this repo"
+          >
+            🗑
+          </button>
+        </div>
+        <div id="repo-label" class="repo-label">Detecting repo…</div>
+      </header>
+
+      <div id="status-bar" class="status-bar hidden"></div>
+
+      <div class="actions">
+        <button id="btn-index">Analyze this repo</button>
+        <button id="btn-arch" disabled>Architecture</button>
+        <button id="btn-interview" disabled>Interview Mode</button>
+        <button id="btn-bugs" disabled>Find Bugs</button>
+      </div>
+
+      <div id="messages" class="messages">
+        <div id="empty-state" class="empty-state">
+          Ask a question about this repo once it's indexed, or try Architecture,
+          Interview Mode, or Find Bugs above.
+        </div>
+      </div>
+
+      <div id="loading-indicator" class="loading-indicator hidden">
+        <span class="spinner"></span> Thinking…
+      </div>
+
+      <div class="input-row">
+        <input
+          id="question-input"
+          type="text"
+          placeholder="Ask about this repo…"
+          disabled
+        />
+        <button id="btn-ask" disabled>Ask</button>
+      </div>
+    </div>
+    <script src="popup.js"></script>
+  </body>
+</html>

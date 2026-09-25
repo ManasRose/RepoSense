@@ -1,0 +1,33 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "chroma": "py -c \"import sys; from chromadb.cli.cli import app; sys.argv=['chroma','run','--path','./chroma-data','--port','8000']; app()\"",
+    "dev:all": "concurrently -n CHROMA,BACKEND -c yellow,green \"npm run chroma\" \"npm run dev\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@babel/parser": "^8.0.5",
+    "@babel/traverse": "^8.0.5",
+    "axios": "^1.20.0",
+    "bcryptjs": "^3.0.3",
+    "chromadb": "^1.9.2",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.10.0",
+    "multer": "^2.3.0",
+    "simple-git": "^3.36.0",
+    "uuid": "^14.0.2"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}
